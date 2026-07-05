@@ -31,7 +31,7 @@ export default function Home() {
       <section className="px-6 pt-14 pb-10 text-center max-w-3xl mx-auto">
         <div className="inline-flex items-center gap-1.5 bg-green-50 text-green-700 text-[12px] font-medium px-3 py-1 rounded-full mb-5">
           <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block"></span>
-          Now serving Sacramento area
+          Now serving Greater Sacramento
         </div>
         <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight leading-[1.1]">
           Get Free Quotes From<br />Trusted Local Pros
@@ -39,10 +39,10 @@ export default function Home() {
         <p className="text-muted text-lg mt-4 max-w-xl mx-auto">
           Tell us what you need. We match you with licensed local professionals — fast, free, and no obligation.
         </p>
-        <div className="flex flex-wrap justify-center gap-5 mt-6 text-[13px] text-muted">
-          <div className="flex items-center gap-1.5"><ShieldCheck size={14} /> Licensed & Insured</div>
-          <div className="flex items-center gap-1.5"><Clock size={14} /> Fast Response</div>
-          <div className="flex items-center gap-1.5"><Star size={14} /> No Obligation</div>
+        <div className="flex flex-wrap justify-center gap-5 mt-6 text-[13px] text-muted" style={{ WebkitTouchCallout: "none" }}>
+          <span className="flex items-center gap-1.5"><ShieldCheck size={14} /> Licensed & Insured</span>
+          <span className="flex items-center gap-1.5"><Clock size={14} /> Fast Response</span>
+          <span className="flex items-center gap-1.5"><Star size={14} /> No Obligation</span>
         </div>
       </section>
 
@@ -67,8 +67,8 @@ export default function Home() {
                   {config.emoji}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-[15px] leading-tight">{loc.service}</div>
-                  <div className="text-[13px] text-muted mt-0.5">{loc.city}, CA</div>
+                  <div className="font-semibold text-[15px] leading-tight truncate">{loc.service}</div>
+                  <div className="text-[13px] text-muted mt-0.5">Sacramento Area, CA</div>
                 </div>
                 <span className="text-muted text-lg group-hover:translate-x-0.5 transition-transform shrink-0">→</span>
               </Link>

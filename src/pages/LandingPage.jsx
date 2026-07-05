@@ -78,7 +78,7 @@ export default function LandingPage() {
         <div className="grid md:grid-cols-2 gap-10 items-start">
           <div className="pt-4">
             <div className="inline-flex items-center gap-1.5 bg-blue-50 text-brand text-[12px] font-medium px-3 py-1 rounded-full mb-4">
-              📍 {location.city}, CA
+              📍 Greater Sacramento, CA
             </div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight leading-[1.1]">
               {location.headline}
