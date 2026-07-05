@@ -93,21 +93,9 @@ export default function LandingPage() {
                 </div>
               ))}
             </div>
-
-            {/* Services mini-list */}
-            <div className="mt-8 p-4 bg-canvasAlt rounded-2xl">
-              <p className="text-[12px] font-medium text-muted uppercase tracking-widest mb-3">We handle</p>
-              <div className="flex flex-wrap gap-2">
-                {location.services.map((s) => (
-                  <span key={s} className="text-[13px] bg-white border border-border px-3 py-1 rounded-full">
-                    {s}
-                  </span>
-                ))}
-              </div>
-            </div>
           </div>
 
-          <div id="quote-form" ref={quoteFormRef}>
+          <div id="quote-form" ref={quoteFormRef} className="shadow-card rounded-2xl">
             <QuoteWizard location={location} onComplete={handleComplete} />
           </div>
         </div>
@@ -124,7 +112,7 @@ export default function LandingPage() {
               { num: "3", icon: "📞", title: "They reach out fast", desc: "A local provider calls or texts you — usually within the hour." },
             ].map((step) => (
               <div key={step.num} className="bg-white rounded-2xl p-5 text-left border border-border">
-                <div className="text-2xl mb-3">{step.icon}</div>
+                <div className="text-2xl mb-3" role="img">{step.icon}</div>
                 <div className="text-[11px] font-semibold text-muted uppercase tracking-widest mb-1">Step {step.num}</div>
                 <div className="font-semibold text-[15px]">{step.title}</div>
                 <div className="text-[13px] text-muted mt-1 leading-relaxed">{step.desc}</div>
