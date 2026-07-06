@@ -102,10 +102,20 @@ export default function QuoteWizard({ location, onComplete }) {
     const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
     const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
     const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-    if (!serviceId || !templateId || !publicKey) return;
+
+    console.log("EmailJS config check:", {
+      hasServiceId: !!serviceId,
+      hasTemplateId: !!templateId,
+      hasPublicKey: !!publicKey,
+    });
+
+    if (!serviceId || !templateId || !publicKey) {
+      console.error("EmailJS: missing env vars — check VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, VITE_EMAILJS_PUBLIC_KEY in Netlify");
+      return;
+    }
 
     try {
-      await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+      const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -125,9 +135,10 @@ export default function QuoteWizard({ location, onComplete }) {
           },
         }),
       });
+      const text = await res.text();
+      console.log("EmailJS response:", res.status, text);
     } catch (err) {
-      // Never block the user flow over a notification failure
-      console.error("Email notification failed:", err.message);
+      console.error("EmailJS fetch failed:", err.message);
     }
   }
 
