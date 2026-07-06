@@ -86,11 +86,48 @@ export default function QuoteWizard({ location, onComplete }) {
 
     try {
       await api.submitLead(lead);
+      // Send email notification client-side via EmailJS — this works
+      // reliably from the browser where EmailJS is designed to run,
+      // unlike server-side calls which EmailJS doesn't fully support.
+      await sendEmailNotification(lead);
       onComplete(lead);
     } catch (err) {
-      console.error("Lead submission failed:", err.message); // never log the full lead object
+      console.error("Lead submission failed:", err.message);
       setError(err.message || "Something went wrong submitting your request. Please try again.");
       setSubmitting(false);
+    }
+  }
+
+  async function sendEmailNotification(lead) {
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+    if (!serviceId || !templateId || !publicKey) return;
+
+    try {
+      await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          service_id: serviceId,
+          template_id: templateId,
+          user_id: publicKey,
+          template_params: {
+            lead_name: lead.name,
+            lead_phone: lead.phone,
+            lead_email: lead.email || "—",
+            lead_city: lead.city || "—",
+            lead_service: lead.serviceNeeded || "—",
+            lead_urgency: lead.urgency || "—",
+            lead_score: lead.leadScore ?? "—",
+            lead_notes: lead.notes || "—",
+            lead_industry: lead.industry || "—",
+          },
+        }),
+      });
+    } catch (err) {
+      // Never block the user flow over a notification failure
+      console.error("Email notification failed:", err.message);
     }
   }
 
