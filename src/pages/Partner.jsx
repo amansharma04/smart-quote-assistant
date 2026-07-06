@@ -22,7 +22,7 @@ export default function Partner() {
           </div>
           <div className="bg-canvasAlt rounded-2xl p-5 border border-border">
             <h2 className="font-semibold mb-1">Get started</h2>
-            <p className="text-muted">Email us at <a href="mailto:partner@smartquoteassistant.com" className="text-brand hover:underline">partner@smartquoteassistant.com</a> with your name, business, service type, and service area.</p>
+            <p className="text-muted">Email us at <a href="mailto:smartquoteassistant@gmail.com" className="text-brand hover:underline">smartquoteassistant@gmail.com</a> with your name, business, service type, and service area.</p>
           </div>
         </div>
       </main>
