@@ -14,11 +14,11 @@ export default function Contact() {
         <div className="space-y-4 text-[15px]">
           <div className="bg-canvasAlt rounded-2xl p-5 border border-border">
             <h2 className="font-semibold mb-1">General inquiries</h2>
-            <a href="mailto:hello@smartquoteassistant.com" className="text-brand hover:underline">smartquoteassistant@gmail.com</a>
+            <a href="mailto:smartquoteassistant@gmail.com" className="text-brand hover:underline">smartquoteassistant@gmail.com</a>
           </div>
           <div className="bg-canvasAlt rounded-2xl p-5 border border-border">
             <h2 className="font-semibold mb-1">Partner with us</h2>
-            <a href="mailto:partner@smartquoteassistant.com" className="text-brand hover:underline">smartquoteassistant@gmail.com</a>
+            <a href="mailto:smartquoteassistant@gmail.com" className="text-brand hover:underline">smartquoteassistant@gmail.com</a>
           </div>
         </div>
       </main>
