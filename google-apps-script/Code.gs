@@ -60,13 +60,9 @@ function doPost(e) {
   }
 
   if (body.action === "upsert") {
-    // Full row replace/insert — used when creating a new lead.
     upsertRow(sheet, body.row);
-    // Send email notification directly from Apps Script — most reliable
-    // approach since it runs server-side with no CSP or env var issues.
-    if (body.row && body.row.status === "New") {
-      sendLeadNotification(body.row);
-    }
+    // Email is sent by a separate time-driven trigger (sendNewLeadEmails)
+    // so it never blocks or breaks the webhook response.
     return jsonResponse({ success: true });
   }
 
@@ -127,6 +123,87 @@ function mergeRow(sheet, rowObj) {
   // If the row doesn't exist yet, fall back to a plain append with
   // whatever fields were provided.
   appendRow(sheet, rowObj);
+}
+
+/**
+ * EMAIL TRIGGER — run this on a time-driven trigger every 5 minutes.
+ *
+ * SETUP:
+ * 1. In Apps Script → Triggers (clock icon on left sidebar)
+ * 2. Add Trigger → Function: sendNewLeadEmails
+ * 3. Event source: Time-driven → Minutes timer → Every 5 minutes
+ * 4. Save
+ *
+ * This checks for leads where emailSent is blank, sends a notification
+ * email, then marks emailSent = "yes" so it never sends twice.
+ * Make sure NOTIFY_EMAIL is set in Script Properties.
+ */
+function sendNewLeadEmails() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Leads");
+  if (!sheet) return;
+
+  const notifyEmail = PropertiesService.getScriptProperties().getProperty("NOTIFY_EMAIL");
+  if (!notifyEmail) return;
+
+  const data = sheet.getDataRange().getValues();
+  if (data.length < 2) return;
+
+  const headers = data[0];
+  const statusIdx = headers.indexOf("status");
+  const nameIdx = headers.indexOf("name");
+  const phoneIdx = headers.indexOf("phone");
+  const emailIdx = headers.indexOf("email");
+  const serviceIdx = headers.indexOf("serviceNeeded");
+  const urgencyIdx = headers.indexOf("urgency");
+  const notesIdx = headers.indexOf("notes");
+  const scoreIdx = headers.indexOf("leadScore");
+
+  // We use internalNotes to track if email was sent — check for "email_sent" tag
+  const internalNotesIdx = headers.indexOf("internalNotes");
+
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    const status = row[statusIdx];
+    const internalNotes = row[internalNotesIdx] || "";
+
+    // Only email for New leads that haven't been emailed yet
+    if (status !== "New" || internalNotes.includes("email_sent")) continue;
+
+    const name = row[nameIdx] || "Unknown";
+    const phone = row[phoneIdx] || "—";
+    const emailAddr = row[emailIdx] || "—";
+    const service = row[serviceIdx] || "—";
+    const urgency = row[urgencyIdx] || "—";
+    const notes = row[notesIdx] || "—";
+    const score = row[scoreIdx] || "—";
+
+    try {
+      MailApp.sendEmail(
+        notifyEmail,
+        "New Lead: " + name + " — " + service,
+        [
+          "New lead from Smart Quote Assistant!",
+          "",
+          "Name: " + name,
+          "Phone: " + phone,
+          "Email: " + emailAddr,
+          "Service: " + service,
+          "Urgency: " + urgency,
+          "Lead Score: " + score,
+          "Notes: " + notes,
+          "",
+          "Follow up as soon as possible!",
+        ].join("\n")
+      );
+
+      // Mark as emailed so we don't send again
+      const newNotes = internalNotes ? internalNotes + " | email_sent" : "email_sent";
+      sheet.getRange(i + 1, internalNotesIdx + 1).setValue(newNotes);
+
+    } catch (err) {
+      console.error("Failed to send email for lead " + name + ": " + err.message);
+    }
+  }
 }
 
 function sendLeadNotification(lead) {
