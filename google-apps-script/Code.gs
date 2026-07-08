@@ -62,6 +62,11 @@ function doPost(e) {
   if (body.action === "upsert") {
     // Full row replace/insert — used when creating a new lead.
     upsertRow(sheet, body.row);
+    // Send email notification directly from Apps Script — most reliable
+    // approach since it runs server-side with no CSP or env var issues.
+    if (body.row && body.row.status === "New") {
+      sendLeadNotification(body.row);
+    }
     return jsonResponse({ success: true });
   }
 
@@ -122,6 +127,34 @@ function mergeRow(sheet, rowObj) {
   // If the row doesn't exist yet, fall back to a plain append with
   // whatever fields were provided.
   appendRow(sheet, rowObj);
+}
+
+function sendLeadNotification(lead) {
+  try {
+    const to = PropertiesService.getScriptProperties().getProperty("NOTIFY_EMAIL");
+    if (!to) return; // Set NOTIFY_EMAIL in Script Properties to enable
+
+    const subject = "New Lead: " + (lead.name || "Unknown") + " — " + (lead.serviceNeeded || lead.industry || "");
+    const body = [
+      "New lead from Smart Quote Assistant!",
+      "",
+      "Name: " + (lead.name || "—"),
+      "Phone: " + (lead.phone || "—"),
+      "Email: " + (lead.email || "—"),
+      "Service: " + (lead.serviceNeeded || "—"),
+      "Urgency: " + (lead.urgency || "—"),
+      "City: " + (lead.city || "—"),
+      "Lead Score: " + (lead.leadScore || "—"),
+      "Notes: " + (lead.notes || "—"),
+      "",
+      "Follow up as soon as possible!",
+    ].join("\n");
+
+    MailApp.sendEmail(to, subject, body);
+  } catch (err) {
+    // Never let email failure break the lead save
+    console.error("Email notification failed: " + err.message);
+  }
 }
 
 function jsonResponse(obj, statusCode) {
